@@ -6,89 +6,60 @@ using UnityEngine.UIElements;
 public class StatisticsWindow : EditorWindow
 {
     [MenuItem("Window/Total statistics")]
-    public static void ShowWindow()
-    {
-        EditorWindow.GetWindow(typeof(StatisticsWindow));
-
+    public static void ShowWindow() {
+        var window = GetWindow<StatisticsWindow>();
+        window.titleContent = new GUIContent("Stats Monitor");
     }
-    List<string> options = new List<string>
-    {
-        "Total Statistics",
-        "Current Session Statistics"
-    };
+    
+    static readonly string[] tabLabels = {"Total Statistics","Current Session Statistics"};
 
-    [SerializeField] private int m_SelectedIndex = -1;
-    private VisualElement m_RightPane;
-    CurrentSession testWindow;
-    Total totalWindow;
-    private void CreateGUI()
-    {
-        testWindow = new CurrentSession();
-        totalWindow = new Total();
+    int _selectedIndex = -1;
+    ScrollView _contentPane;
+    readonly List<Button> _tabButtons = new();
+
+    // Windows
+    CurrentSession _currentSessionView;
+    Total _totalView;
+
+    void CreateGUI() {
+        _currentSessionView = new CurrentSession();
+        _totalView = new Total();
+
         var root = rootVisualElement;
-        var splitView = new TwoPaneSplitView(0, 250, TwoPaneSplitViewOrientation.Horizontal);
-        root.Add(splitView);
+        root.AddToClassList("stats-window");
 
-        var leftPane = new ListView();
-        leftPane.style.backgroundColor = new Color(0, 0, 0, 0.45f);
-        splitView.Add(leftPane);
-        m_RightPane = new VisualElement();
+        var styleSheet = StylesheetLocator.Load();
+        if (styleSheet != null)
+            root.styleSheets.Add(styleSheet);
 
-        splitView.Add(m_RightPane);
+        var tabBar = new VisualElement();
+        tabBar.AddToClassList("tab-bar");
+        root.Add(tabBar);
 
-        leftPane.makeItem = () =>
-        {
-            var container = new VisualElement
-            {
-                style = {
-                flexDirection = FlexDirection.Row,
-                justifyContent = Justify.FlexStart,
-                alignItems = Align.Center,
-                height = 30
-                }
-            };
+        for (int i = 0; i < tabLabels.Length; i++) {
+            int tabIndex = i;
+            var tab = new Button(() => SelectTab(tabIndex)) { text = tabLabels[i] };
+            tab.AddToClassList("tab-button");
+            tabBar.Add(tab);
+            _tabButtons.Add(tab);
+        }
 
-            var label = new Label
-            {
-                style = { unityTextAlign = TextAnchor.MiddleCenter }
-            };
+        _contentPane = new ScrollView(ScrollViewMode.Vertical);
+        _contentPane.AddToClassList("tab-content");
+        root.Add(_contentPane);
 
-            container.Add(label);
-            return container;
-        };
+        SelectTab(_selectedIndex);
 
-        var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Packages/com.humsteri.stats-monitor/Editor/styles.uss");
-        leftPane.bindItem = (item, index) =>
-        {
-            var label = item.Q<Label>();
-            label.text = options[index];
-        };
-        
-        leftPane.itemsSource = options;
-        leftPane.fixedItemHeight = 30;
-        
-        leftPane.selectionChanged += (items) => { m_SelectedIndex = leftPane.selectedIndex; };
-        leftPane.selectionChanged += OnSelectionChanged;
-        leftPane.selectedIndex = m_SelectedIndex;
     }
 
-    private void OnSelectionChanged(IEnumerable<object> items)
-    {
-        m_RightPane.Clear(); // Clear previous content
-        
-        switch (m_SelectedIndex)
-        {
-            case 0:
-                m_RightPane.Add(totalWindow);
-                break;
-            case 1:
-                m_RightPane.Add(testWindow);
-                break;
-            case 2:
+    void SelectTab(int index) {
+        _selectedIndex = index;
 
-                break;
-            default:
-                break;
+        for (int i = 0; i < _tabButtons.Count; i++) {
+            _tabButtons[i].EnableInClassList("tab-button--active", i == index);
         }
+
+        _contentPane.Clear();
+        _contentPane.Add(index == 0 ? (VisualElement)_totalView : _currentSessionView);
     }
 }

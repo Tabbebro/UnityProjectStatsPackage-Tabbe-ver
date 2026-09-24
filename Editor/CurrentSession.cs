@@ -5,77 +5,85 @@ using UnityEngine.UIElements;
 
 public class CurrentSession : VisualElement
 {
-    public static CurrentSession instance;
-    int timesProjectCompiled = 0, timesPlayModePressed = 0, totalScenesOpenedAmount = 0, totalRedoAmount = 0, totalUndoAmount = 0;
-    int normalLogAmount = 0, warningLogAmount = 0, errorLogAmount = 0, assertLogAmount = 0, exceptionLogAmount = 0;
-    float currentSessionLength = 0f;
-    double totalDomainReloadTime = 0f, totalPlayModeTime = 0f;
+    public static CurrentSession Instance;
 
-    private Label _sessionLengthLabel;
-    private Label _sessionSceneOpenedCountLabel;
-    private Label _sessionPlayModeCountLabel;
-    private Label _sessionCompiledCountLabel;
-    private Label _sessionRedoCountLabel;
-    private Label _sessionUndoCountLabel;
-    private Label _sessionNormalLogCountLabel;
-    private Label _sessionErrorLogCountLabel;
-    private Label _sessionWarningLogCountLabel;
-    private Label _sessionAssertLogCountLabel;
-    private Label _sessionExceptionLogCountLabel;
-    private Label _sessionDomainReloadTimeLabel;
-    private Label _sessionPlayModeTimeLabel;
+    // Action Stats
+    int _timesProjectCompiled = 0;      // How Many Times Project Script Have Been Compiled
+    int _timesPlayModePressed = 0;      // How Many Times Playmode Has Been Entered
+    int _totalScenesOpenedAmount = 0;   // How Many Times Scenes Have Been Opened
+
+    // Edit Stats
+    int _totalRedoAmount = 0;   // How Many Times Redo Action Has Been Done
+    int _totalUndoAmount = 0;   // How Many Times Undo Action Has Been Done
+
+    // Log Stats
+    int _normalLogAmount = 0;   // How Many Normal Logs Have Been Logged
+    int _warningLogAmount = 0;  // How Many Warning Logs Have Been Logged
+    int _errorLogAmount = 0;    // How Many Error Logs Have Been Logged
+    int _assertLogAmount = 0;   // How Many Assert Logs Have Been Logged
+    int _exceptionLogAmount = 0;// How Many Exception Logs Have Been Logged
+    
+    // Timed Stats
+    float _currentSessionLength = 0f;   // Time Which The Current Editor Instance Has Been On
+    double _totalDomainReloadTime = 0f; // Total Time Which Domain Reload Has Taken
+    double _totalPlayModeTime = 0f;     // Total Time Which Has Been Spent In Playmode
+
+    // Labels
+    Label _sessionLengthLabel;
+    Label _sessionSceneOpenedCountLabel;
+    Label _sessionPlayModeCountLabel;
+    Label _sessionCompiledCountLabel;
+    Label _sessionRedoCountLabel;
+    Label _sessionUndoCountLabel;
+    Label _sessionNormalLogCountLabel;
+    Label _sessionErrorLogCountLabel;
+    Label _sessionWarningLogCountLabel;
+    Label _sessionAssertLogCountLabel;
+    Label _sessionExceptionLogCountLabel;
+    Label _sessionDomainReloadTimeLabel;
+    Label _sessionPlayModeTimeLabel;
 
     public CurrentSession()
     {
-        instance = this;
+        Instance = this;
         GetTimes();
 
-        VisualElement container = new VisualElement();
-        container.style.width = 20000;
-        container.style.height = 20000;
-        style.backgroundColor = new Color(0, 0, 0, 0.45f);
-        var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Packages/com.humsteri.stats-monitor/Editor/styles.uss");
-        Add(container);
+        AddToClassList("stats-root");
+        var styleSheet = StylesheetLocator.Load();
+        if (styleSheet != null) {
+            styleSheets.Add(styleSheet);
+        }
 
-        container.Add(NewTextLabel("[ Timers ]", new Vector2(45, 0), TextAnchor.MiddleLeft));
-        container.Add(NewTimeLabel(ref _sessionLengthLabel, styleSheet, currentSessionLength, new Vector2(50,40), new Vector2(120, 30)));
-        container.Add(NewTextLabel("Current", new Vector2(50, 60), TextAnchor.MiddleCenter));
-        container.Add(NewTimeLabel(ref _sessionDomainReloadTimeLabel, styleSheet, totalDomainReloadTime, new Vector2(200,40), new Vector2(120, 30)));
-        container.Add(NewTextLabel("Domain Reload", new Vector2(200, 60), TextAnchor.MiddleCenter));
-        container.Add(NewTimeLabel(ref _sessionPlayModeTimeLabel, styleSheet, totalPlayModeTime, new Vector2(350,40), new Vector2(120, 30)));
-        container.Add(NewTextLabel("Play time", new Vector2(350,60), TextAnchor.MiddleCenter));
+        Add(SectionTitle("Timers"));
+        var timerRow = StatRow();
+        timerRow.Add(StatCard(ref _sessionLengthLabel, "Time Spent\n(Session)",        FormatTime(_currentSessionLength)));
+        timerRow.Add(StatCard(ref _sessionDomainReloadTimeLabel, "Domain Reload\n(Session)",  FormatTime(_totalDomainReloadTime)));
+        timerRow.Add(StatCard(ref _sessionPlayModeTimeLabel, "Play Time\n(Session)",      FormatTime(_totalPlayModeTime)));
+        Add(timerRow);
 
+        Add(SectionTitle("Actions"));
+        var actionRow = StatRow();
+        actionRow.Add(StatCard(ref _sessionCompiledCountLabel, "Times Compiled\n(Session)",       _timesProjectCompiled.ToString()));
+        actionRow.Add(StatCard(ref _sessionPlayModeCountLabel, "Play Mode Entered\n(Session)",    _timesPlayModePressed.ToString()));
+        actionRow.Add(StatCard(ref _sessionSceneOpenedCountLabel, "Scenes Opened\n(Session)",        _totalScenesOpenedAmount.ToString()));
+        Add(actionRow);
 
-        container.Add(NewTextLabel("[ Actions ]", new Vector2(45, 100), TextAnchor.MiddleLeft));
-        container.Add(NewCountLabel(ref _sessionSceneOpenedCountLabel, styleSheet, totalScenesOpenedAmount, new Vector2(50, 140)));
-        container.Add(NewTextLabel("Scenes opened", new Vector2(50, 160), TextAnchor.MiddleCenter));
-        container.Add(NewCountLabel(ref _sessionCompiledCountLabel, styleSheet, timesProjectCompiled, new Vector2(200, 140)));
-        container.Add(NewTextLabel("Times compiled", new Vector2(200, 160), TextAnchor.MiddleCenter));
-        container.Add(NewCountLabel(ref _sessionPlayModeCountLabel, styleSheet, timesPlayModePressed, new Vector2(350, 140)));
-        container.Add(NewTextLabel("Play mode entered" , new Vector2(350, 160), TextAnchor.MiddleCenter));
+        Add(SectionTitle("Edits"));
+        var editRow = StatRow();
+        editRow.Add(StatCard(ref _sessionRedoCountLabel, "Times Redo\n(Session)", _totalRedoAmount.ToString()));
+        editRow.Add(StatCard(ref _sessionUndoCountLabel, "Times Undo\n(Session)", _totalUndoAmount.ToString()));
+        Add(editRow);
 
+        Add(SectionTitle("Logs"));
+        var logRow = StatRow();
+        logRow.Add(StatCard(ref _sessionNormalLogCountLabel, "Normal Log Count\n(Session)",     _normalLogAmount.ToString()));
+        logRow.Add(StatCard(ref _sessionWarningLogCountLabel, "Warning Log Count\n(Session)",    _warningLogAmount.ToString()));
+        logRow.Add(StatCard(ref _sessionErrorLogCountLabel, "Error Log Count\n(Session)",      _errorLogAmount.ToString()));
+        logRow.Add(StatCard(ref _sessionExceptionLogCountLabel, "Exception Log Count\n(Session)",  _exceptionLogAmount.ToString()));
+        logRow.Add(StatCard(ref _sessionAssertLogCountLabel, "Assert Log Count\n(Session)",     _assertLogAmount.ToString()));
+        Add(logRow);
 
-        container.Add(NewTextLabel("[ Edits ]", new Vector2(45, 200), TextAnchor.MiddleLeft));
-        container.Add(NewCountLabel(ref _sessionRedoCountLabel, styleSheet, totalRedoAmount, new Vector2(50, 240)));
-        container.Add(NewTextLabel("Times Redo", new Vector2(50, 260), TextAnchor.MiddleCenter));
-        container.Add(NewCountLabel(ref _sessionUndoCountLabel, styleSheet, totalUndoAmount, new Vector2(200, 240)));
-        container.Add(NewTextLabel("Times Undo", new Vector2(200, 260), TextAnchor.MiddleCenter));
-
-
-        container.Add(NewTextLabel("[ Logs ]", new Vector2(45, 300), TextAnchor.MiddleLeft));
-        container.Add(NewCountLabel(ref _sessionNormalLogCountLabel, styleSheet, normalLogAmount, new Vector2(50, 340)));
-        container.Add(NewTextLabel("Normal log count", new Vector2(50, 360), TextAnchor.MiddleCenter));
-        container.Add(NewCountLabel(ref _sessionWarningLogCountLabel, styleSheet, warningLogAmount, new Vector2(200, 340)));
-        container.Add(NewTextLabel("Warning log count", new Vector2(200, 360), TextAnchor.MiddleCenter));
-        container.Add(NewCountLabel(ref _sessionErrorLogCountLabel, styleSheet, errorLogAmount, new Vector2(350, 340)));
-        container.Add(NewTextLabel("Error log count", new Vector2(350, 360), TextAnchor.MiddleCenter));
-        container.Add(NewCountLabel(ref _sessionExceptionLogCountLabel, styleSheet, exceptionLogAmount, new Vector2(50, 400)));
-        container.Add(NewTextLabel("Exception log count", new Vector2(50, 420), TextAnchor.MiddleCenter));
-        container.Add(NewCountLabel(ref _sessionAssertLogCountLabel, styleSheet, assertLogAmount, new Vector2(200, 400)));
-        container.Add(NewTextLabel("Assert log count", new Vector2(200, 420), TextAnchor.MiddleCenter));
-
-
-        EditorApplication.update += UpdateTime;
+        EditorApplication.update += UpdateCurrentSessionTime;
         DailyLoadManager.Instance.CompiledAction += SetCompiled;
         DailyLoadManager.Instance.PlayModeAction += UpdatePlayModeEntered;
         DailyLoadManager.Instance.PlayModeTimeAction += AddPlayModeTime;
@@ -84,151 +92,154 @@ public class CurrentSession : VisualElement
         DailyLoadManager.Instance.RedoAction += UpdateRedo;
         DailyLoadManager.Instance.UndoAction += UpdateUndo;
         DailyLoadManager.Instance.LogAction += UpdateLog;
+
+        RegisterCallback<DetachFromPanelEvent>(OnDetachFromPanel);
     }
+
     #region Label Makers
-    Label NewTextLabel(string txt, Vector2 pos, TextAnchor center)
-    {
-        Label label = new Label($"{txt}");
-        label.style.width = 120;
-        label.style.height = 45;
-        label.style.unityTextAlign = center;
-        label.style.justifyContent = Justify.Center;
-        label.style.alignItems = Align.Center;
-        label.style.whiteSpace = WhiteSpace.Normal;
-        label.style.position = Position.Absolute;
-        label.style.left = pos.x;
-        label.style.top = pos.y;
+
+    VisualElement StatRow() {
+        var row = new VisualElement();
+        row.AddToClassList("stat-row");
+        return row;
+    }
+
+    Label SectionTitle(string txt) {
+        var label = new Label($"[ {txt} ]");
+        label.AddToClassList("section-title");
         return label;
     }
-    Label NewTimeLabel(ref Label label, StyleSheet styleSheet, double time, Vector2 pos, Vector2 size)
-    {
-        label = new Label($"{TimeSpan.FromSeconds(time).Hours} H " +
-            $"{TimeSpan.FromSeconds(time).Minutes} mm " +
-            $"{TimeSpan.FromSeconds(time).Seconds} s ");
-        label.style.width = size.x;
-        label.style.height = size.y;
-        label.styleSheets.Add(styleSheet);
-        label.AddToClassList("rounded-box");
-        label.style.backgroundColor = new Color(122f / 255f, 28f / 255f, 172f / 255f, 1f);
-        label.style.unityTextAlign = TextAnchor.MiddleCenter;
-        label.style.justifyContent = Justify.Center;
-        label.style.alignItems = Align.Center;
-        label.style.whiteSpace = WhiteSpace.Normal;
-        label.style.position = Position.Absolute;
-        label.style.left = pos.x;
-        label.style.top = pos.y;
-        return label;
+
+    VisualElement StatCard(ref Label valueLabel, string caption, string value) {
+        var card = new VisualElement();
+        card.AddToClassList("stat-card");
+
+        valueLabel = new Label(value);
+        valueLabel.AddToClassList("stat-value");
+        card.Add(valueLabel);
+
+        var captionLabel = new Label(caption);
+        captionLabel.AddToClassList("stat-label");
+        card.Add(captionLabel);
+
+        return card;
     }
-    Label NewCountLabel(ref Label label, StyleSheet styleSheet, int count, Vector2 pos)
-    {
-        label = new Label($"{count}");
-        label.style.width = 120;
-        label.style.height = 30;
-        label.styleSheets.Add(styleSheet);
-        label.AddToClassList("rounded-box");
-        label.style.backgroundColor = new Color(122f / 255f, 28f / 255f, 172f / 255f, 1f);
-        label.style.unityTextAlign = TextAnchor.MiddleCenter;
-        label.style.justifyContent = Justify.Center;
-        label.style.alignItems = Align.Center;
-        label.style.whiteSpace = WhiteSpace.Normal;
-        label.style.position = Position.Absolute;
-        label.style.left = pos.x;
-        label.style.top = pos.y;
-        return label;
-    }
+
     #endregion
+
     #region Label updaters
-    void UpdateTime()
-    {
-        currentSessionLength = (float)(EditorApplication.timeSinceStartup);
-        _sessionLengthLabel.text = $"{(int)TimeSpan.FromSeconds(currentSessionLength).TotalHours} H " +
-            $"{TimeSpan.FromSeconds(currentSessionLength).Minutes} mm " +
-            $"{TimeSpan.FromSeconds(currentSessionLength).Seconds} ss";
+
+    // Formats Time From Seconds Into Hours, Minutes & Seconds
+    string FormatTime(double seconds) {
+        var ts = TimeSpan.FromSeconds(seconds);
+        return $"{(int)ts.TotalHours} h {ts.Minutes} m {ts.Seconds} s";
     }
+
+    // Updates Time Which Editor Has Been On
+    void UpdateCurrentSessionTime()
+    {
+        _currentSessionLength = (float)(EditorApplication.timeSinceStartup);
+        _sessionLengthLabel.text = FormatTime(_currentSessionLength);
+    }
+
+    // Updates Time Domain Reload Has Taken
     private void AddDomainReloadTime(double obj)
     {
-        totalDomainReloadTime = obj;
-        _sessionDomainReloadTimeLabel.text = $"{TimeSpan.FromSeconds(totalDomainReloadTime).Hours} H " +
-            $"{TimeSpan.FromSeconds(totalDomainReloadTime).Minutes} mm " +
-            $"{TimeSpan.FromSeconds(totalDomainReloadTime).Seconds} ss ";
+        _totalDomainReloadTime = obj;
+        _sessionDomainReloadTimeLabel.text = FormatTime(_totalDomainReloadTime);
     }
+
+    // Updates Time Spent In Playmode
     private void AddPlayModeTime(double obj)
     {
-        _sessionPlayModeTimeLabel.text = $"{TimeSpan.FromSeconds(obj).Hours} H " +
-            $"{TimeSpan.FromSeconds(obj).Minutes} mm " +
-            $"{TimeSpan.FromSeconds(obj).Seconds} ss ";
+        _sessionPlayModeTimeLabel.text = FormatTime(obj);
     }
+
+    // Updates Times Playmode Has Been Entered
     private void UpdatePlayModeEntered(int obj)
     {
-        _sessionPlayModeCountLabel.text = $"{obj}";
+        _sessionPlayModeCountLabel.text = obj.ToString();
     }
+
+    // Updates Times The Redo Action Has Been Done
     private void UpdateRedo(int obj)
     {
-        _sessionRedoCountLabel.text = $"{obj}";
+        _sessionRedoCountLabel.text = obj.ToString();
     }
+
+    // Updates Times The Undo Action Has Been Done
     private void UpdateUndo(int arg2)
     {
-        _sessionUndoCountLabel.text = $"{arg2}";
+        _sessionUndoCountLabel.text = arg2.ToString();
     }
+
+    // Updates Times Each Log Type Has Been "Logged" 
     private void UpdateLog(LogType type, int arg2)
     {
         switch (type)
         {
             case LogType.Error:
-                _sessionErrorLogCountLabel.text = $"{arg2}";
+                _sessionErrorLogCountLabel.text = arg2.ToString();
                 break;
             case LogType.Assert:
-                _sessionAssertLogCountLabel.text = $"{arg2}";
+                _sessionAssertLogCountLabel.text = arg2.ToString();
                 break;
             case LogType.Warning:
-                _sessionWarningLogCountLabel.text = $"{arg2}";
+                _sessionWarningLogCountLabel.text = arg2.ToString();
                 break;
             case LogType.Log:
-                _sessionNormalLogCountLabel.text = $"{arg2}";
+                _sessionNormalLogCountLabel.text = arg2.ToString();
                 break;
             case LogType.Exception:
-                _sessionExceptionLogCountLabel.text = $"{arg2}";
-                break;
-            default:
+                _sessionExceptionLogCountLabel.text = arg2.ToString();
                 break;
         }
     }
+
+    // Updates Times Scenes Has Been Opened
     private void UpdateScene(int count)
     {
-        _sessionSceneOpenedCountLabel.text = $"{count}";
+        _sessionSceneOpenedCountLabel.text = count.ToString();
     }
+
+    // Updates Times Project Has Compiled
     public void SetCompiled(int count)
     {
-        _sessionCompiledCountLabel.text = $"{count}";
+        _sessionCompiledCountLabel.text = count.ToString();
     }
+
     #endregion
+
     void GetTimes()
     {
-        timesProjectCompiled = DailyLoadManager.Instance.Compiled();
-        timesPlayModePressed = DailyLoadManager.Instance.PlayPressed();
-        totalRedoAmount = DailyLoadManager.Instance.Redo();
-        totalUndoAmount = DailyLoadManager.Instance.Undo();
-        totalDomainReloadTime = DailyLoadManager.Instance.TotalDomainReloadTime();
-        totalPlayModeTime = DailyLoadManager.Instance.TotalPlayModeTime();
-        totalScenesOpenedAmount = DailyLoadManager.Instance.ScenesOpened();
-        normalLogAmount = DailyLoadManager.Instance.GetLogType(LogType.Log);
-        warningLogAmount = DailyLoadManager.Instance.GetLogType(LogType.Warning);
-        errorLogAmount = DailyLoadManager.Instance.GetLogType(LogType.Error);
-        exceptionLogAmount = DailyLoadManager.Instance.GetLogType(LogType.Exception);
-        assertLogAmount = DailyLoadManager.Instance.GetLogType(LogType.Assert);
-        currentSessionLength = (float)(EditorApplication.timeSinceStartup);
+        _timesProjectCompiled = DailyLoadManager.Instance.Compiled();
+        _timesPlayModePressed = DailyLoadManager.Instance.PlayPressed();
+        _totalRedoAmount = DailyLoadManager.Instance.Redo();
+        _totalUndoAmount = DailyLoadManager.Instance.Undo();
+        _totalDomainReloadTime = DailyLoadManager.Instance.TotalDomainReloadTime();
+        _totalPlayModeTime = DailyLoadManager.Instance.TotalPlayModeTime();
+        _totalScenesOpenedAmount = DailyLoadManager.Instance.ScenesOpened();
+        _normalLogAmount = DailyLoadManager.Instance.GetLogType(LogType.Log);
+        _warningLogAmount = DailyLoadManager.Instance.GetLogType(LogType.Warning);
+        _errorLogAmount = DailyLoadManager.Instance.GetLogType(LogType.Error);
+        _exceptionLogAmount = DailyLoadManager.Instance.GetLogType(LogType.Exception);
+        _assertLogAmount = DailyLoadManager.Instance.GetLogType(LogType.Assert);
+        _currentSessionLength = (float)(EditorApplication.timeSinceStartup);
     }
-    ~CurrentSession()
-    {
-        EditorApplication.update -= UpdateTime;
+
+    void OnDetachFromPanel(DetachFromPanelEvent evt) {
+        EditorApplication.update -= UpdateCurrentSessionTime;
         DailyLoadManager.Instance.CompiledAction -= SetCompiled;
         DailyLoadManager.Instance.PlayModeAction -= UpdatePlayModeEntered;
+        DailyLoadManager.Instance.PlayModeTimeAction -= AddPlayModeTime;
+        DailyLoadManager.Instance.DomainReloadTimeAction -= AddDomainReloadTime;
         DailyLoadManager.Instance.SceneAction -= UpdateScene;
-        DailyLoadManager.Instance.UndoAction -= UpdateRedo;
-        DailyLoadManager.Instance.RedoAction -= UpdateUndo;
+        DailyLoadManager.Instance.RedoAction -= UpdateRedo;
+        DailyLoadManager.Instance.UndoAction -= UpdateUndo;
         DailyLoadManager.Instance.LogAction -= UpdateLog;
-        DailyLoadManager.Instance.PlayModeAction -= UpdatePlayModeEntered;
-        if (instance == this)
-            instance = null;
+        
+        if (Instance == this) {
+            Instance = null;
+        }
     }
 }

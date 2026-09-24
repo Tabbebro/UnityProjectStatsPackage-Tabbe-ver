@@ -1,3 +1,98 @@
+.stats-window {
+    background-color: var(--unity-colors-window-background, #383838);
+    --accent-color: #480085;
+}
+
+.tab-bar {
+    flex-direction: row;
+    background-color: var(--unity-colors-toolbar-background, #cbcbcb);
+    border-bottom-width: 1px;
+    border-bottom-color: var(--unity-colors-toolbar_button-border, #999999);
+    padding: 4px 4px 0 4px;
+}
+
+.tab-button {
+    flex-grow: 0;
+    margin: 0 2px 0 0;
+    padding: 6px 16px;
+    border-radius: 4px 4px 0 0;
+    background-color: var(--unity-colors-tab-background, #c8c8c8);
+    color: var(--unity-colors-tab-text, #1b1b1b);
+    border-width: 0;
+    -unity-font-style: normal;
+}
+
+.tab-button:hover {
+    background-color: var(--unity-colors-tab-background-hover, #d6d6d6);
+}
+
+.tab-button--active {
+    background-color: var(--unity-colors-tab-background-checked, #4c4c4c);
+    color: var(--unity-colors-default-text, #d2d2d2);
+    -unity-font-style: bold;
+    border-bottom-width: 2px;
+    border-bottom-color: var(--accent-color, #480085);
+}
+
+.tab-button:focus,
+.tab-button--active:focus {
+    color: var(--unity-colors-default-text, #d2d2d2);
+}
+
+.tab-content {
+    flex-grow: 1;
+    background-color: var(--unity-colors-window-background, #383838);
+}
+
+.stats-root {
+    padding: 16px;
+}
+
+.section-title {
+    font-size: 12px;
+    -unity-font-style: bold;
+    color: var(--unity-colors-default-text, #b4b4b4);
+    letter-spacing: 1px;
+    margin-top: 14px;
+    margin-bottom: 6px;
+}
+
+.stat-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.stat-card {
+    width: 130px;
+    min-height: 56px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    padding: 8px;
+    border-radius: 6px;
+    background-color: var(--unity-colors-box-background, #3f3f3f);
+    border-width: 1px;
+    border-color: var(--unity-colors-box-border, #232323);
+    border-left-width: 3px;
+    border-left-color: var(--accent-color, #480085);
+    justify-content: center;
+}
+
+.stat-value {
+    font-size: 18px;
+    -unity-font-style: bold;
+    color: var(--unity-colors-default-text, #d2d2d2);
+    -unity-text-align: middle-left;
+}
+
+.stat-label {
+    font-size: 10px;
+    color: var(--unity-colors-default-text, #9c9c9c);
+    -unity-text-align: middle-left;
+    margin-top: 2px;
+    white-space: normal;
+    opacity: 0.75;
+}
+
 .rounded-box {
     width: 100px;
     height: 100px;
