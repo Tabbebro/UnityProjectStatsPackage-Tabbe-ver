@@ -17,14 +17,13 @@ public class StatisticsWindow : EditorWindow
     readonly List<Button> _tabButtons = new();
 
     // Windows
-    CurrentSession _currentSessionView;
-    Total _totalView;
+    StatisticsTabSession _currentSession;
+    StatisticsTabTotal _total;
 
     void CreateGUI() {
         titleContent = new GUIContent("Stats Monitor", EditorGUIUtility.FindTexture("UnityEditor.ProfilerWindow"));
-
-        _currentSessionView = new CurrentSession();
-        _totalView = new Total();
+        _currentSession = new();
+        _total = new();
 
         var root = rootVisualElement;
         root.AddToClassList("stats-window");
@@ -61,6 +60,13 @@ public class StatisticsWindow : EditorWindow
         }
 
         _contentPane.Clear();
-        _contentPane.Add(index == 0 ? (VisualElement)_totalView : _currentSessionView);
+
+        VisualElement openedElement = index switch {
+            0 => _total,
+            1 => _currentSession,
+            _ => _total
+        };
+
+        _contentPane.Add(openedElement);
     }
 }
