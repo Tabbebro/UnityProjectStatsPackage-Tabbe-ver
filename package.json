@@ -1,10 +1,10 @@
 {
-  "name": "com.humsteri.stats-monitor",
-  "version": "0.1.0",
+  "name": "com.tabbe.stats-monitor",
+  "version": "0.2.0",
   "displayName": "Stats Monitor",
-  "description": "Window to monitor and track project stats.",
+  "description": "Editor window to monitor and track different project stats E.g. Spent Time, Domain Reload Time & Console Logs.",
   "unity": "6000.0",
   "author": {
-    "name": "humsteri"
+    "name": "Tabbe"
   }
 }
