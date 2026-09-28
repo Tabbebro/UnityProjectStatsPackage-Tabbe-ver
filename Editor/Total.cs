@@ -140,7 +140,7 @@ public class Total : VisualElement
     // Formats Time From Seconds Into Hours, Minutes & Seconds
     string FormatTime(double seconds) {
         var ts = TimeSpan.FromSeconds(seconds);
-        return $"{(int)ts.TotalHours} h {ts.Minutes} m {ts.Seconds} s";
+        return $"{(int)ts.TotalHours}:{ts.Minutes}:{ts.Seconds} s";
     }
 
     // Updates Domain Reload Time To The Total Amount

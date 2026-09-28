@@ -132,7 +132,7 @@ public class CurrentSession : VisualElement
     // Formats Time From Seconds Into Hours, Minutes & Seconds
     string FormatTime(double seconds) {
         var ts = TimeSpan.FromSeconds(seconds);
-        return $"{(int)ts.TotalHours} h {ts.Minutes} m {ts.Seconds} s";
+        return $"{(int)ts.TotalHours}:{ts.Minutes}:{ts.Seconds} s";
     }
 
     // Updates Time Which Editor Has Been On
