@@ -45,49 +45,49 @@ public class StatisticsTabSession : StatisticsTab {
     }
 
     protected override void GetTimes() {
-        _compileAmount = DailyLoadManager.Instance.Compiled();
-        _playmodeEnterAmount = DailyLoadManager.Instance.PlayPressed();
-        _redoAmount = DailyLoadManager.Instance.Redo();
-        _undoAmount = DailyLoadManager.Instance.Undo();
-        _domainReloadTime = DailyLoadManager.Instance.TotalDomainReloadTime();
-        _playmodeTime = DailyLoadManager.Instance.TotalPlayModeTime();
-        _sceneOpenAmount = DailyLoadManager.Instance.ScenesOpened();
-        _normalLogAmount = DailyLoadManager.Instance.GetLogType(LogType.Log);
-        _warningLogAmount = DailyLoadManager.Instance.GetLogType(LogType.Warning);
-        _errorLogAmount = DailyLoadManager.Instance.GetLogType(LogType.Error);
-        _exceptionLogAmount = DailyLoadManager.Instance.GetLogType(LogType.Exception);
-        _assertLogAmount = DailyLoadManager.Instance.GetLogType(LogType.Assert);
+        _compileAmount = LoadManagerSession.Instance.Compiled();
+        _playmodeEnterAmount = LoadManagerSession.Instance.PlayPressed();
+        _redoAmount = LoadManagerSession.Instance.Redo();
+        _undoAmount = LoadManagerSession.Instance.Undo();
+        _domainReloadTime = LoadManagerSession.Instance.TotalDomainReloadTime();
+        _playmodeTime = LoadManagerSession.Instance.TotalPlayModeTime();
+        _sceneOpenAmount = LoadManagerSession.Instance.ScenesOpened();
+        _normalLogAmount = LoadManagerSession.Instance.GetLogType(LogType.Log);
+        _warningLogAmount = LoadManagerSession.Instance.GetLogType(LogType.Warning);
+        _errorLogAmount = LoadManagerSession.Instance.GetLogType(LogType.Error);
+        _exceptionLogAmount = LoadManagerSession.Instance.GetLogType(LogType.Exception);
+        _assertLogAmount = LoadManagerSession.Instance.GetLogType(LogType.Assert);
         _timeSpent = EditorApplication.timeSinceStartup;
     }
 
     protected override void Subscribe() {
         Instance = this; // Restores Instance When The Tab Is Attached Again
 
-        DailyLoadManager.Instance.CompiledAction += SetCompiled;
-        DailyLoadManager.Instance.PlayModeAction += UpdatePlayModeEntered;
-        DailyLoadManager.Instance.SceneAction += UpdateScene;
+        LoadManagerSession.Instance.CompiledAction += SetCompiled;
+        LoadManagerSession.Instance.PlayModeAction += UpdatePlayModeEntered;
+        LoadManagerSession.Instance.SceneAction += UpdateScene;
 
-        DailyLoadManager.Instance.RedoAction += UpdateRedo;
-        DailyLoadManager.Instance.UndoAction += UpdateUndo;
+        LoadManagerSession.Instance.RedoAction += UpdateRedo;
+        LoadManagerSession.Instance.UndoAction += UpdateUndo;
 
-        DailyLoadManager.Instance.LogAction += UpdateLog;
+        LoadManagerSession.Instance.LogAction += UpdateLog;
 
-        DailyLoadManager.Instance.DomainReloadTimeAction += AddDomainReloadTime;
-        DailyLoadManager.Instance.PlayModeTimeAction += AddPlayModeTime;
+        LoadManagerSession.Instance.DomainReloadTimeAction += AddDomainReloadTime;
+        LoadManagerSession.Instance.PlayModeTimeAction += AddPlayModeTime;
     }
 
     protected override void Unsubscribe() {
-        DailyLoadManager.Instance.CompiledAction -= SetCompiled;
-        DailyLoadManager.Instance.PlayModeAction -= UpdatePlayModeEntered;
-        DailyLoadManager.Instance.SceneAction -= UpdateScene;
+        LoadManagerSession.Instance.CompiledAction -= SetCompiled;
+        LoadManagerSession.Instance.PlayModeAction -= UpdatePlayModeEntered;
+        LoadManagerSession.Instance.SceneAction -= UpdateScene;
 
-        DailyLoadManager.Instance.RedoAction -= UpdateRedo;
-        DailyLoadManager.Instance.UndoAction -= UpdateUndo;
+        LoadManagerSession.Instance.RedoAction -= UpdateRedo;
+        LoadManagerSession.Instance.UndoAction -= UpdateUndo;
 
-        DailyLoadManager.Instance.LogAction -= UpdateLog;
+        LoadManagerSession.Instance.LogAction -= UpdateLog;
 
-        DailyLoadManager.Instance.DomainReloadTimeAction -= AddDomainReloadTime;
-        DailyLoadManager.Instance.PlayModeTimeAction -= AddPlayModeTime;
+        LoadManagerSession.Instance.DomainReloadTimeAction -= AddDomainReloadTime;
+        LoadManagerSession.Instance.PlayModeTimeAction -= AddPlayModeTime;
 
         if (Instance == this) {
             Instance = null;

@@ -47,8 +47,8 @@ static class StatsTracker
         double elapsedSeconds = StopTimer(ReloadStartKey);
         if (elapsedSeconds < 0) { return; }
 
-        LoadManager.Instance.AddDomainReloadTime(elapsedSeconds);
-        DailyLoadManager.Instance.AddDomainReloadTime(elapsedSeconds);
+        LoadManagerTotal.Instance.AddDomainReloadTime(elapsedSeconds);
+        LoadManagerSession.Instance.AddDomainReloadTime(elapsedSeconds);
         SaveAll();
     }
 
@@ -59,8 +59,8 @@ static class StatsTracker
     static void OnCompilationFinished(object obj) {
         if (_incrementedThisCompilation) { return; }
 
-        LoadManager.Instance.IncrementCompiled();
-        DailyLoadManager.Instance.IncrementCompiled();
+        LoadManagerTotal.Instance.IncrementCompiled();
+        LoadManagerSession.Instance.IncrementCompiled();
         SaveAll();
         _incrementedThisCompilation = true;
     }
@@ -68,8 +68,8 @@ static class StatsTracker
     static void OnPlaymodeStateChanged(PlayModeStateChange change) {
         switch (change) {
             case PlayModeStateChange.ExitingEditMode:
-                LoadManager.Instance.IncrementPlayPressed();
-                DailyLoadManager.Instance.IncrementPlayPressed();
+                LoadManagerTotal.Instance.IncrementPlayPressed();
+                LoadManagerSession.Instance.IncrementPlayPressed();
                 SaveAll();
                 break;
             case PlayModeStateChange.EnteredPlayMode:
@@ -78,8 +78,8 @@ static class StatsTracker
             case PlayModeStateChange.ExitingPlayMode:
                 double elapsedSeconds = StopTimer(PlayModeStartKey);
                 if (elapsedSeconds >= 0) {
-                    LoadManager.Instance.AddPlayModeTime(elapsedSeconds);
-                    DailyLoadManager.Instance.AddPlayModeTime(elapsedSeconds);
+                    LoadManagerTotal.Instance.AddPlayModeTime(elapsedSeconds);
+                    LoadManagerSession.Instance.AddPlayModeTime(elapsedSeconds);
                     SaveAll();
                 }
                 break;
@@ -91,37 +91,37 @@ static class StatsTracker
     static void OnQuit() {
         // Total: Add This Session To The Lifetime Data
         double sessionSeconds = EditorApplication.timeSinceStartup;
-        LoadManager.Instance.AddTime((float)sessionSeconds);
-        if (sessionSeconds > LoadManager.Instance.LongestSession()) {
-            LoadManager.Instance.SetLongestSession(sessionSeconds);
+        LoadManagerTotal.Instance.AddTime((float)sessionSeconds);
+        if (sessionSeconds > LoadManagerTotal.Instance.LongestSession()) {
+            LoadManagerTotal.Instance.SetLongestSession(sessionSeconds);
         }
-        LoadManager.Instance.Opened(false);
+        LoadManagerTotal.Instance.Opened(false);
 
-        DailyLoadManager.Instance.Reset();
+        LoadManagerSession.Instance.Reset();
 
         SaveAll();
     }
 
     static void OnSceneOpened(Scene scene, OpenSceneMode mode) {
-        LoadManager.Instance.IncrementScenesOpened();
-        DailyLoadManager.Instance.IncrementScenesOpened();
+        LoadManagerTotal.Instance.IncrementScenesOpened();
+        LoadManagerSession.Instance.IncrementScenesOpened();
         SaveAll();
     }
 
     static void OnUndoOrRedo(in UndoRedoInfo undo) {
         if (undo.isRedo) {
-            LoadManager.Instance.IncrementRedo();
-            DailyLoadManager.Instance.IncrementRedo();
+            LoadManagerTotal.Instance.IncrementRedo();
+            LoadManagerSession.Instance.IncrementRedo();
         }
         else {
-            LoadManager.Instance.IncrementUndo();
-            DailyLoadManager.Instance.IncrementUndo();
+            LoadManagerTotal.Instance.IncrementUndo();
+            LoadManagerSession.Instance.IncrementUndo();
         }
     }
 
     static void OnLogReceived(string condition, string stackTrace, LogType type) {
-        LoadManager.Instance.IncrementLog(type);
-        DailyLoadManager.Instance.IncrementLog(type);
+        LoadManagerTotal.Instance.IncrementLog(type);
+        LoadManagerSession.Instance.IncrementLog(type);
     }
 
     #endregion
@@ -130,15 +130,15 @@ static class StatsTracker
     #region Helpers
 
     static void CountProjectSession() {
-        if (LoadManager.Instance.GetOpened()) { return; }
+        if (LoadManagerTotal.Instance.GetOpened()) { return; }
 
-        LoadManager.Instance.IncrementOpened();
-        LoadManager.Instance.Opened(true);
+        LoadManagerTotal.Instance.IncrementOpened();
+        LoadManagerTotal.Instance.Opened(true);
     }
 
     static void SaveAll() {
-        LoadManager.Instance.Save();
-        DailyLoadManager.Instance.Save();
+        LoadManagerTotal.Instance.Save();
+        LoadManagerSession.Instance.Save();
     }
 
     // Stores The Current Timestamp In EditorPrefs So It Survives A Domain Reload

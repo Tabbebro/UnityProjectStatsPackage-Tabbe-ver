@@ -50,26 +50,26 @@ public class StatisticsTabTotal : StatisticsTab {
     }
 
     protected override void GetTimes() {
-        _projectOpenedAmount = LoadManager.Instance.Opened();
-        _compileAmount = LoadManager.Instance.Compiled();
-        _playmodeEnterAmount = LoadManager.Instance.PlayPressed();
-        _sceneOpenAmount = LoadManager.Instance.ScenesOpened();
-        _crashAmount = LoadManager.Instance.Crashesh();
+        _projectOpenedAmount = LoadManagerTotal.Instance.Opened();
+        _compileAmount = LoadManagerTotal.Instance.Compiled();
+        _playmodeEnterAmount = LoadManagerTotal.Instance.PlayPressed();
+        _sceneOpenAmount = LoadManagerTotal.Instance.ScenesOpened();
+        _crashAmount = LoadManagerTotal.Instance.Crashesh();
 
-        _redoAmount = LoadManager.Instance.Redo();
-        _undoAmount = LoadManager.Instance.Undo();
+        _redoAmount = LoadManagerTotal.Instance.Redo();
+        _undoAmount = LoadManagerTotal.Instance.Undo();
 
-        _normalLogAmount = LoadManager.Instance.GetLogType(LogType.Log);
-        _warningLogAmount = LoadManager.Instance.GetLogType(LogType.Warning);
-        _errorLogAmount = LoadManager.Instance.GetLogType(LogType.Error);
-        _exceptionLogAmount = LoadManager.Instance.GetLogType(LogType.Exception);
-        _assertLogAmount = LoadManager.Instance.GetLogType(LogType.Assert);
+        _normalLogAmount = LoadManagerTotal.Instance.GetLogType(LogType.Log);
+        _warningLogAmount = LoadManagerTotal.Instance.GetLogType(LogType.Warning);
+        _errorLogAmount = LoadManagerTotal.Instance.GetLogType(LogType.Error);
+        _exceptionLogAmount = LoadManagerTotal.Instance.GetLogType(LogType.Exception);
+        _assertLogAmount = LoadManagerTotal.Instance.GetLogType(LogType.Assert);
 
-        _savedTimeSpent = LoadManager.Instance.TotalTime();
+        _savedTimeSpent = LoadManagerTotal.Instance.TotalTime();
         _timeSpent = _savedTimeSpent;
-        _domainReloadTime = LoadManager.Instance.TotalDomainReloadTime();
-        _playmodeTime = LoadManager.Instance.TotalPlayModeTime();
-        _longestSession = LoadManager.Instance.LongestSession();
+        _domainReloadTime = LoadManagerTotal.Instance.TotalDomainReloadTime();
+        _playmodeTime = LoadManagerTotal.Instance.TotalPlayModeTime();
+        _longestSession = LoadManagerTotal.Instance.LongestSession();
 
         //_currentSessionLength = (float)(EditorApplication.timeSinceStartup);
     }
@@ -83,31 +83,31 @@ public class StatisticsTabTotal : StatisticsTab {
     protected override void Subscribe() {
         Instance = this; // Restores Instance When The Tab Is Attached Again
 
-        LoadManager.Instance.CompiledAction += SetCompiled;
-        LoadManager.Instance.PlayModeAction += UpdatePlayModeEntered;
-        LoadManager.Instance.SceneAction += UpdateScene;
+        LoadManagerTotal.Instance.CompiledAction += SetCompiled;
+        LoadManagerTotal.Instance.PlayModeAction += UpdatePlayModeEntered;
+        LoadManagerTotal.Instance.SceneAction += UpdateScene;
 
-        LoadManager.Instance.RedoAction += UpdateRedo;
-        LoadManager.Instance.UndoAction += UpdateUndo;
+        LoadManagerTotal.Instance.RedoAction += UpdateRedo;
+        LoadManagerTotal.Instance.UndoAction += UpdateUndo;
 
-        LoadManager.Instance.LogAction += UpdateLog;
+        LoadManagerTotal.Instance.LogAction += UpdateLog;
 
-        LoadManager.Instance.DomainReloadTimeAction += AddDomainReloadTime;
-        LoadManager.Instance.PlayModeTimeAction += AddPlayModeTime;
+        LoadManagerTotal.Instance.DomainReloadTimeAction += AddDomainReloadTime;
+        LoadManagerTotal.Instance.PlayModeTimeAction += AddPlayModeTime;
     }
 
     protected override void Unsubscribe() {
-        LoadManager.Instance.CompiledAction -= SetCompiled;
-        LoadManager.Instance.PlayModeAction -= UpdatePlayModeEntered;
-        LoadManager.Instance.SceneAction -= UpdateScene;
+        LoadManagerTotal.Instance.CompiledAction -= SetCompiled;
+        LoadManagerTotal.Instance.PlayModeAction -= UpdatePlayModeEntered;
+        LoadManagerTotal.Instance.SceneAction -= UpdateScene;
 
-        LoadManager.Instance.RedoAction -= UpdateRedo;
-        LoadManager.Instance.UndoAction -= UpdateUndo;
+        LoadManagerTotal.Instance.RedoAction -= UpdateRedo;
+        LoadManagerTotal.Instance.UndoAction -= UpdateUndo;
 
-        LoadManager.Instance.LogAction -= UpdateLog;
+        LoadManagerTotal.Instance.LogAction -= UpdateLog;
 
-        LoadManager.Instance.DomainReloadTimeAction -= AddDomainReloadTime;
-        LoadManager.Instance.PlayModeTimeAction -= AddPlayModeTime;
+        LoadManagerTotal.Instance.DomainReloadTimeAction -= AddDomainReloadTime;
+        LoadManagerTotal.Instance.PlayModeTimeAction -= AddPlayModeTime;
 
         if (Instance == this) {
             Instance = null;
