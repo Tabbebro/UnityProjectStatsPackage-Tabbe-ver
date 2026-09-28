@@ -49,10 +49,13 @@
 }
 
 .section-title {
-    font-size: 12px;
-    -unity-font-style: bold;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    padding: 0px 0 3px 8px;
+    border-left-width: 3px;
+    border-left-color: var(--accent-color, #480085);
     color: var(--unity-colors-default-text, #b4b4b4);
-    letter-spacing: 1px;
+    -unity-font-style: bold;
     margin-top: 14px;
     margin-bottom: 6px;
 }

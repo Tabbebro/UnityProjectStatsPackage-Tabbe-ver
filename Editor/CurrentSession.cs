@@ -105,7 +105,7 @@ public class CurrentSession : VisualElement
     }
 
     Label SectionTitle(string txt) {
-        var label = new Label($"[ {txt} ]");
+        var label = new Label(txt.ToUpper());
         label.AddToClassList("section-title");
         return label;
     }
@@ -132,7 +132,7 @@ public class CurrentSession : VisualElement
     // Formats Time From Seconds Into Hours, Minutes & Seconds
     string FormatTime(double seconds) {
         var ts = TimeSpan.FromSeconds(seconds);
-        return $"{(int)ts.TotalHours}:{ts.Minutes}:{ts.Seconds}";
+        return $"{(int)ts.TotalHours:00}:{ts.Minutes:00}:{ts.Seconds:00}";
     }
 
     // Updates Time Which Editor Has Been On

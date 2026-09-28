@@ -7,8 +7,7 @@ public class StatisticsWindow : EditorWindow
 {
     [MenuItem("Window/Total statistics")]
     public static void ShowWindow() {
-        var window = GetWindow<StatisticsWindow>();
-        window.titleContent = new GUIContent("Stats Monitor");
+        GetWindow<StatisticsWindow>();
     }
     
     static readonly string[] tabLabels = {"Total Statistics","Current Session Statistics"};
@@ -22,6 +21,8 @@ public class StatisticsWindow : EditorWindow
     Total _totalView;
 
     void CreateGUI() {
+        titleContent = new GUIContent("Stats Monitor", EditorGUIUtility.FindTexture("UnityEditor.ProfilerWindow"));
+
         _currentSessionView = new CurrentSession();
         _totalView = new Total();
 

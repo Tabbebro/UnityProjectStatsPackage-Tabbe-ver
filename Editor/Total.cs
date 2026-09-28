@@ -113,7 +113,7 @@ public class Total : VisualElement
     }
 
     Label SectionTitle(string txt) {
-        var label = new Label($"[ {txt} ]");
+        var label = new Label(txt.ToUpper());
         label.AddToClassList("section-title");
         return label;
     }
@@ -140,7 +140,7 @@ public class Total : VisualElement
     // Formats Time From Seconds Into Hours, Minutes & Seconds
     string FormatTime(double seconds) {
         var ts = TimeSpan.FromSeconds(seconds);
-        return $"{(int)ts.TotalHours}:{ts.Minutes}:{ts.Seconds}";
+        return $"{(int)ts.TotalHours:00}:{ts.Minutes:00}:{ts.Seconds:00}";
     }
 
     // Updates Domain Reload Time To The Total Amount
